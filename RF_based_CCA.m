@@ -127,23 +127,6 @@ switch data_choice
             fashion{j}=images(:,labels==i);
             j=j+1;
         end
-    case 'Kuzushiji'
-        selected_labels=[3 4];
-        noise_level_dB= -Inf; %-Inf, -3 or 3
-        init_data = loadMNISTImages('../datasets/Kuzushiji-MNIST/train-images-idx3-ubyte');
-        init_labels = loadMNISTLabels('../datasets/Kuzushiji-MNIST/train-labels-idx1-ubyte');
-    case 'kannada'
-        selected_labels=[4 8];
-        noise_level_dB= -15; %-Inf, -3 or 3
-        init_data = loadMNISTImages('../datasets/kannada-MNIST/train-images-idx3-ubyte');
-        init_labels = loadMNISTLabels('../datasets/kannada-MNIST/train-labels-idx1-ubyte');
-    case 'CIFAR'
-        selected_labels=[0 1];
-        noise_level_dB= -Inf; %-Inf, -3 or 3
-        data1 = readNPY('../datasets/CIFAR_feature/Real_hamburger_googlenet.npy');
-        data2 = readNPY('../datasets/CIFAR_feature/Real_coffee_googlenet.npy');
-%         data1 = readNPY('../datasets/CIFAR_feature/Real_pizza_googlenet.npy');
-%         data2 = readNPY('../datasets/CIFAR_feature/Real_daisy_googlenet.npy');
 
     case 'EEG'
         %init_images=processing_EEG();
@@ -180,40 +163,28 @@ switch data_choice
             EEG{j}=images(:,labels==i);
             j=j+1;
         end
+		
+	case 'CIFAR'
+        selected_labels=[0 1];
+        noise_level_dB= -Inf; %-Inf, -3 or 3
+        data1 = readNPY('../datasets/CIFAR_feature/Real_hamburger_googlenet.npy');
+        data2 = readNPY('../datasets/CIFAR_feature/Real_coffee_googlenet.npy');
+%         data1 = readNPY('../datasets/CIFAR_feature/Real_pizza_googlenet.npy');
+%         data2 = readNPY('../datasets/CIFAR_feature/Real_daisy_googlenet.npy');
+
 end
 
-%[labels,idx_init_labels]=sort(init_labels,'ascend');
-%data=init_data(:,idx_init_labels);
-
-%init_n=length(data(1,:));
-%p=length(data(:,1));
 
 if length(selected_labels) ~= k
     error('Error: selected labels and nb of classes not equal!')
 end
 
-% Data preprecessing
-% data = data/max(data(:));
-% mean_data=mean(data,2);
-% norm2_data=0;
-% for i=1:init_n
-%     norm2_data=norm2_data+1/init_n*norm(data(:,i)-mean_data)^2;
-% end
-% data=(data-mean_data*ones(1,size(data,2)))/sqrt(norm2_data)*sqrt(p);
-% 
-% 
-% selected_data = cell(k,1);
-% cascade_selected_data=[];
-% j=1;
-% for i=selected_labels
-%     selected_data{j} = data(:,labels==i);
-%     j = j+1;
-% end
-
 
 X=zeros(p,n);
 n_train = n/2;
 n_test = n/2;
+
+%%% We want to create two views of the dataset. The first view will be the first class and the second view will be the second class
 X1_train=zeros(p,cs(1)*n_train);
 X2_train=zeros(p,cs(2)*n_train);
 X1_test=zeros(p,cs(1)*n_test);
@@ -266,24 +237,10 @@ end
 
 %mean(diag(X*X'))/n
 tau_est = trace(X*X'/n)/p
-%%%%%%%%%%% PERFS %%%%%%%%%%% 
-%     D = diag((diag(X'*X)).^(-1/2));
-%     X = X*D*sqrt(p);
-%     X = (mapstd(X'))';
+
 % Add Gaussian noise to data
 noise_level=10^(noise_level_dB/10);
-%Noise = rand(p,n)*sqrt(12)*sqrt(noise_level*var(X(:)));
-%X = X*(eye(n) - ones(n)/n);
-%X=X+Noise;
-%X = randn(p,n)+means*(v');
 
-%K = f(X'*X/sqrt(p))/sqrt(p);
-% fashion : -0.1710    0.7618    1.3604
-% mnist: -0.22 0.815 0.41 1.46
-% eeg: -0.8041    2.1842    3.7763
-
-%t = 1.47;
-%s = 4.60;
 switch data_choice
     case 'MNIST'
         s_minus = 0.0090;
@@ -301,79 +258,62 @@ switch data_choice
         r = 0.2963;
         t = 1.6767;
 end
-%s_minus = 0;
-%s_plus = 0;
-%r = 1;
-%t = 1;
-
-
 rte=0;
 
 for data_index = 1:nb_average_loop
-    %         D = diag((diag(X'*X)).^(-1/2));
-    %         X = X*D*sqrt(p);
-    %         X = (mapstd(X'))';
-    noise_level=10^(noise_level_dB/10);
-    Noise = rand(p,n)*sqrt(12)*sqrt(noise_level*var(X(:)));
-    %X = X*(eye(n) - ones(n)/n);
-    %X=X+Noise;
-    %X = randn(p,n)+means*(v');
 
-    %K = f(X'*X/sqrt(p))/sqrt(p);
-W = sign(randn(N,p));
-%W = randn(N,p);
-%b1 = 2*pi*rand(N,size(X1_train,2))-pi; %b1 = rand(N,size(X1_train,2));
-%b2= 2*pi*rand(N,size(X2_train,2))-pi;%b2 = rand(N,size(X2_train,2));
+	W = sign(randn(N,p));  %%% Symmetric Bernoulli weights
+	%W = randn(N,p);   		%%% Gaussian weights
 
-switch f_choice
-    case 'sign'
-        K11 = f(W*X1_train)'*f(W*X1_train)/p;
-		K22 = f(W*X2_train)'*f(W*X2_train)/p;
-		K12 = f(W*X1_train)'*f(W*X2_train)/p;
-        XX = f(W*X1_train);
-        YY = f(W*X2_train);
-    case 'cos'
-        K11 = f(W*X1_train)'*f(W*X1_train)/p;
-		K22 = f(W*X2_train)'*f(W*X2_train)/p;
-		K12 = f(W*X1_train)'*f(W*X2_train)/p;
-        XX = f(W*X1_train);
-        YY = f(W*X2_train);
-    case 'relu' 
-        K11 = f(W*X1_train)'*f(W*X1_train)/p;
-		K22 = f(W*X2_train)'*f(W*X2_train)/p;
-		K12 = f(W*X1_train)'*f(W*X2_train)/p;
-        XX = f(W*X1_train);
-        YY = f(W*X2_train);
-    case 'ternary'
-        K11 = f(W*X1_train, s_minus, s_plus, r, t)'*f(W*X1_train, s_minus, s_plus, r, t)/p;
-		K22 = f(W*X2_train, s_minus, s_plus, r, t)'*f(W*X2_train, s_minus, s_plus, r, t)/p;
-		K12 = f(W*X1_train, s_minus, s_plus, r, t)'*f(W*X2_train, s_minus, s_plus, r, t)/p;
-        XX = f(W*X1_train, s_minus, s_plus, r, t);
-        YY = f(W*X2_train, s_minus, s_plus, r, t);
-    case 'abs'
-        K11 = f(W*X1_train)'*f(W*X1_train)/p;
-		K22 = f(W*X2_train)'*f(W*X2_train)/p;
-		K12 = f(W*X1_train)'*f(W*X2_train)/p;
-        XX = f(W*X1_train);
-        YY = f(W*X2_train);
-    case 'binary'
-        K11 = f(W*X1_train+b1)'*f(W*X1_train+b1)/p;
-		K22 = f(W*X2_train+b2)'*f(W*X2_train+b2)/p;
-		K12 = f(W*X1_train+b1)'*f(W*X2_train+b2)/p;
-end
+	switch f_choice
+		case 'sign'
+			K11 = f(W*X1_train)'*f(W*X1_train)/p;
+			K22 = f(W*X2_train)'*f(W*X2_train)/p;
+			K12 = f(W*X1_train)'*f(W*X2_train)/p;
+			XX = f(W*X1_train);
+			YY = f(W*X2_train);
+		case 'cos'
+			K11 = f(W*X1_train)'*f(W*X1_train)/p;
+			K22 = f(W*X2_train)'*f(W*X2_train)/p;
+			K12 = f(W*X1_train)'*f(W*X2_train)/p;
+			XX = f(W*X1_train);
+			YY = f(W*X2_train);
+		case 'relu' 
+			K11 = f(W*X1_train)'*f(W*X1_train)/p;
+			K22 = f(W*X2_train)'*f(W*X2_train)/p;
+			K12 = f(W*X1_train)'*f(W*X2_train)/p;
+			XX = f(W*X1_train);
+			YY = f(W*X2_train);
+		case 'ternary'
+			K11 = f(W*X1_train, s_minus, s_plus, r, t)'*f(W*X1_train, s_minus, s_plus, r, t)/p;
+			K22 = f(W*X2_train, s_minus, s_plus, r, t)'*f(W*X2_train, s_minus, s_plus, r, t)/p;
+			K12 = f(W*X1_train, s_minus, s_plus, r, t)'*f(W*X2_train, s_minus, s_plus, r, t)/p;
+			XX = f(W*X1_train, s_minus, s_plus, r, t);
+			YY = f(W*X2_train, s_minus, s_plus, r, t);
+		case 'abs'
+			K11 = f(W*X1_train)'*f(W*X1_train)/p;
+			K22 = f(W*X2_train)'*f(W*X2_train)/p;
+			K12 = f(W*X1_train)'*f(W*X2_train)/p;
+			XX = f(W*X1_train);
+			YY = f(W*X2_train);
+		case 'binary'
+			K11 = f(W*X1_train+b1)'*f(W*X1_train+b1)/p;
+			K22 = f(W*X2_train+b2)'*f(W*X2_train+b2)/p;
+			K12 = f(W*X1_train+b1)'*f(W*X2_train+b2)/p;
+	end
 
-[a, b] = rcca_fit(K11, K22, K12,top);
-%[a, b] = rcca_fit(XX,YY);
-[x_cor, y_cor] = rcca_eval(a, b, f, X1_test,X2_test, W, f_choice, s_minus, s_plus, r, t);
-functions = @(i) abs(correlation(x_cor(:,i), y_cor(:,i)));
-tab = 1:1:top;
-r_te = rte + sum(arrayfun(functions,tab))/nb_average_loop;
+	[a, b] = rcca_fit(K11, K22, K12,top);
+	%[a, b] = rcca_fit(XX,YY);
+	[x_cor, y_cor] = rcca_eval(a, b, f, X1_test,X2_test, W, f_choice, s_minus, s_plus, r, t);
+	functions = @(i) abs(correlation(x_cor(:,i), y_cor(:,i)));
+	tab = 1:1:top;
+	r_te = rte + sum(arrayfun(functions,tab))/nb_average_loop;
 end
 r_te
 
 
-function [L, M] = rcca_fit(Kx,Ky,Kxy,top)
-  [L, M]  = geigen(Kxy, Kx, Ky, top); % rcc(augx(x),augy(y),1e-10,1e-10,top);
+function [L, M] = rcca_fit(Kx,Ky,Kxy)
+  [L, M]  = geigen(Kxy, Kx, Ky); % rcc(augx(x),augy(y),1e-10,1e-10,top);
   %cor=sum(abs(values(1:top)));
 end
 
@@ -408,7 +348,7 @@ end
 	
 end
 
-function [L, M]=geigen(A, B, C, top)
+function [L, M]=geigen(A, B, C)
 	p = size(B,1);
 	q = size(C,1);
 % 	s = min(p,q);
