@@ -4,8 +4,8 @@ clear all;
 d1 = 28;
 d2 = 28;
 d3 = 1;
- data = 'MNIST';
-load('data/mnist.mat')
+data = 'MNIST';
+ load('data/mnist.mat')
 y  = [double(train0);double(train1);double(train2);...
       double(train3);double(train4);double(train5);...
       double(train6);double(train7);double(train8);...
@@ -23,7 +23,7 @@ y  = [double(train0);double(train1);double(train2);...
 %load('frey_rawface.mat')
 %y = double(ff')./255;
 running_choice = "RMT"; %% RMT, RCCA; 
-f_choice = "ternary"; %% rcca, sign, relu, ternary, abs
+f_choice = "abs"; % rcca, sign, relu, ternary, abs, binary
 
 p_tr  = 0.8;
 p_va  = 0.1;
@@ -56,7 +56,12 @@ for d=[100]
             case 'sign'
               options = struct('running_choice',running_choice, 'f_choice', f_choice, 's',0.5);
             case 'binary'
-              options = struct('running_choice',running_choice, 'f_choice', f_choice, 's',0.5);
+                switch data
+                    case 'MNIST'
+                        options = struct('running_choice',running_choice, 'f_choice', f_choice, 's', 0.25);
+                    case 'CIFAR10'
+                        options = struct('running_choice',running_choice, 'f_choice', f_choice, 's', 0.2547);
+                end
             case 'ternary'
                 switch data
                     case 'MNIST'

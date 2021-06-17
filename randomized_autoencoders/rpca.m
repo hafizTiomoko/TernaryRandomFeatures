@@ -41,7 +41,8 @@ function [g,y] = rpca(x,k,d, varargin)
     case 'RMT'
       f       = aug(x,k, varargin);
       z = f(x);
-      gram       = f(x)'*f(x); 
+      max(max(z))
+      gram       = f(x)'*f(x);
     case 'RCCA'
       f       = aug(x,k, varargin);
       z = f(x);

@@ -33,7 +33,11 @@ switch f_choice
       r = varargin{1}{1}.r;
       t = varargin{1}{1}.t;
       f = @(x0) (t*(((x0*w)>(sqrt(2)*s_plus))) - r*t*((x0*w)<(sqrt(2)*s_minus)));
-      
+   
+  case 'binary'
+      s_plus = varargin{1}{1}.s;
+      %f = @(x0) max(max(abs(x0*w)));
+      f = @(x0) ((abs(x0*w)>(sqrt(2)*s_plus)));
   case 'rcca'
       %w      = randn(size(x,2),k)/sqrt(size(x,2));
       f = @(x0) cos(x0*w);
