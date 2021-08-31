@@ -2,7 +2,8 @@
 ** This repository contains code for reproducing the experiments in our paper "Data-dependent ternarization of random features models: A Random Matrix Theory approach" **
 ## Content
 * Histogram.ipnb
-* Comparisons generic relU random features kernel with our proposed well tuned ternary kernel
+* Random features-based regression experiments with different kernels including our well tuned ternary kernel
+* Comparisons generic RelU random features kernel with our proposed well tuned ternary kernel
 * Comparisons with LP-RFF methods (The repository of \cite{zhangmay2018lprffs} has been used)
 * [Citation](#citation)
 ## Citation
