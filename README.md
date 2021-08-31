@@ -6,6 +6,10 @@
 * Comparisons generic RelU random features kernel with our proposed well tuned ternary kernel
 * Comparisons with LP-RFF methods (The repository of \cite{zhangmay2018lprffs} has been used)
 * [Citation](#citation)
+
+## Dependencies
+* Python 3.5
+* Numpy, scipy, matplotlib, Tensorflow (For MNIST/Fashion-MNIST dataset), Pytorch (for LP-RFF)
 ## Citation
 ```
 @article{zhangmay2018lprffs,
