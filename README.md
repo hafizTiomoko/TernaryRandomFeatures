@@ -1,4 +1,4 @@
-# Universality_Random_Feature_Models
+# Universality Random Feature Models
 ** This repository contains code for reproducing the experiments in our paper "Data-dependent ternarization of random features models: A Random Matrix Theory approach" **
 ## Content
 * Histogram.ipnb
