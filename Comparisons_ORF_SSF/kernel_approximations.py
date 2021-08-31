@@ -643,105 +643,45 @@ def main():
     #kernel_svm = svm.SVC(gamma=.031, C=100)
     linear_svm = svm.LinearSVC(C=100)
 
-    # reg = LinearRegression()
-    # print(reg.score(X_test_features_rbf, y_test))
-
-    # create pipeline from kernel approximation
-    # and linear svm
-
-
-    #feature_map_nystroem = Nystroem(gamma=.031, random_state=1)
-    # fourier_approx_svm = pipeline.Pipeline([("feature_map", feature_map_fourier),
-    #                                        ("svm", svm.LinearSVC())])
-
-    # nystroem_approx_svm = pipeline.Pipeline([("feature_map", feature_map_nystroem),
-    #                                         ("svm", svm.LinearSVC())])
-
-
-    #nystroem_approx_svm = pipeline.Pipeline([("feature_map", feature_map_nystroem),
-    #                                         ("svm", svm.LinearSVC())])
-
-    # fit and predict using linear and kernel svm:
-    #kernel_svm_time = time()
-    #kernel_svm.fit(data_train, targets_train.ravel())
-    #kernel_svm_score = kernel_svm.score(data_test, targets_test.ravel())
-    #kernel_svm_time = time() - kernel_svm_time
-
     linear_svm_time = time()
     linear_svm.fit(data_train, targets_train.ravel())
     linear_svm_score = linear_svm.score(data_test, targets_test.ravel())
     linear_svm_time = time() - linear_svm_time
 
-    # linear_reg_time = time()
-    # reg.fit(data_train, targets_train)
-    # linear_reg_score = reg.score(data_test, targets_test)
-    # linear_reg_time = time() - linear_reg_time
-
-    # sample_sizes = [5, 10, 50, 100, 500, 1000]
     samples = []
-    fourier_scores = []
-    nystroem_scores = []
     relu_scores = []
     sparse_scores = []
-    fourier_times = []
     relu_times = []
     sparse_times = []
     linear_scores = []
-    kernel_scores = []
     linear_times = []
-    nystroem_times = []
     for D in sample_sizes:
         samples.append(D)
         linear_scores.append(linear_svm_score)
         linear_times.append(linear_svm_time)
-        #kernel_scores.append(kernel_svm_score)
-        #kernel_times.append(kernel_svm_time)
 
         feature_map_relu = RFFSampler(activation='relu', n_components= D, gamma=.031, random_state=1)
         feature_map_fourier = RFFSampler(activation='cos', n_components=D, gamma=.031, random_state=1)
-        feature_map_nystroem = Nystroem(n_components=D, gamma=0.31, random_state=1)
 
-        nystroem_approx_svm = pipeline.Pipeline([("feature_map", feature_map_nystroem),
-                                                ("svm", svm.LinearSVC())])
-        fourier_approx_svm = pipeline.Pipeline([("feature_map", feature_map_fourier),
-                                                ("svm", svm.LinearSVC())])
         relu_approx_svm = pipeline.Pipeline([("feature_map", feature_map_relu),
                                                 ("svm", svm.LinearSVC())])
-        #nystroem_approx_svm.set_params(feature_map__n_components=D)
         sparse_approx_svm = pipeline.Pipeline(
             [("feature_map", SparseSampler(s_plus=s_plus, s_minus=s_minus, n_components=D, gamma=.031, random_state=1)),
              ("svm", svm.LinearSVC())])
-        # sparse_approx_reg = pipeline.Pipeline([("feature_map", SparseSampler(s_plus=s_plus, s_minus=s_minus, n_components=D,gamma=.031, random_state=1)),
-        #                                       ("svm", reg)])
-        #start = time()
-        #nystroem_approx_svm.fit(data_train, targets_train.ravel())
-        #nystroem_times.append(time() - start)
 
         start = time()
         relu_approx_svm.fit(data_train, targets_train.ravel())
         relu_times.append(time() - start)
 
         start = time()
-        fourier_approx_svm.fit(data_train, targets_train.ravel())
-        fourier_times.append(time() - start)
-
-        start = time()
-        nystroem_approx_svm.fit(data_train, targets_train.ravel())
-        nystroem_times.append(time() - start)
-
-        start = time()
         sparse_approx_svm.fit(data_train, targets_train.ravel())
         # sparse_approx_reg.fit(data_train, targets_train.ravel())
         sparse_times.append(time() - start)
 
-        fourier_score = fourier_approx_svm.score(data_test, targets_test.ravel())
-        nystroem_score = nystroem_approx_svm.score(data_test, targets_test.ravel())
         relu_score = relu_approx_svm.score(data_test, targets_test.ravel())
         sparse_score = sparse_approx_svm.score(data_test, targets_test.ravel())
 
         relu_scores.append(relu_score)
-        fourier_scores.append(fourier_score)
-        nystroem_scores.append(nystroem_score)
         sparse_scores.append(sparse_score)
 
     # plot the results:
@@ -753,12 +693,6 @@ def main():
     accuracy.plot(sample_sizes, relu_scores, label="ReLU approx. kernel")
     timescale.plot(sample_sizes, relu_times, '--',
                    label='Relu approx. kernel')
-    accuracy.plot(sample_sizes, fourier_scores, label="Fourier approx. kernel")
-    timescale.plot(sample_sizes, fourier_times, '--',
-                   label='Fourier approx. kernel')
-    accuracy.plot(sample_sizes, nystroem_scores, label="Nystroem approx. kernel")
-    timescale.plot(sample_sizes, nystroem_times, '--',
-                   label='Nystroem approx. kernel')
     accuracy.plot(sample_sizes, sparse_scores, label="Sparse approx. kernel")
     timescale.plot(sample_sizes, sparse_times, '--',
                    label='Sparse approx. kernel')
@@ -769,13 +703,6 @@ def main():
     timescale.plot([sample_sizes[0], sample_sizes[-1]], [linear_svm_time,
                                                          linear_svm_time], '--', label='linear svm')
 
-    #accuracy.plot([sample_sizes[0], sample_sizes[-1]], [kernel_svm_score,
-    #                                                    kernel_svm_score], label="rbf svm")
-    #timescale.plot([sample_sizes[0], sample_sizes[-1]], [kernel_svm_time,
-    #                                                     kernel_svm_time], '--', label='rbf svm')
-
-    # vertical line for dataset dimensionality = 64
-    # accuracy.plot([64, 64], [0.7, 1], label="n_features")
 
     # legends and labels
     accuracy.set_title("Classification accuracy")
@@ -795,17 +722,9 @@ def main():
     print("\n")
     print("".join("({},{})".format(x, y) for x, y in zip(samples, linear_times)))
     print("\n")
-    print("".join("({},{})".format(x, y) for x, y in zip(samples, nystroem_scores)))
-    print("\n")
-    print("".join("({},{})".format(x, y) for x, y in zip(samples, nystroem_times)))
-    print("\n")
     print("".join("({},{})".format(x, y) for x, y in zip(samples, relu_scores)))
     print("\n")
     print("".join("({},{})".format(x, y) for x, y in zip(samples, relu_times)))
-    print("\n")
-    print("".join("({},{})".format(x, y) for x, y in zip(samples, fourier_scores)))
-    print("\n")
-    print("".join("({},{})".format(x, y) for x, y in zip(samples, fourier_times)))
     print("\n")
     print("".join("({},{})".format(x, y) for x, y in zip(samples, sparse_scores)))
     print("\n")
