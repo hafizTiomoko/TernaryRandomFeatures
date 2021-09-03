@@ -10,6 +10,8 @@
 ## Dependencies
 * Python 3.5
 * Numpy, scipy, matplotlib, Tensorflow (For MNIST/Fashion-MNIST dataset), Pytorch (for LP-RFF)
+## Simulations
+* To reproduce Figure 1 in our paper, run
 ## Citation
 ```
 @article{zhangmay2018lprffs,
