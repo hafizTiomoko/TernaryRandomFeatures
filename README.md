@@ -12,6 +12,9 @@
 * Numpy, scipy, matplotlib, Tensorflow (For MNIST/Fashion-MNIST dataset), Pytorch (for LP-RFF)
 ## Simulations
 * To reproduce Figure 1 in our paper, run
+```
+python run_model.py   --approx_type=nystrom --do_fp_feat --n_feat=50000  --model=logistic_regression --opt=sgd --minibatch=250 --l2_reg=1e-05    --epoch=10 --learning_rate=1 --fixed_epoch_number   --kernel_sigma=0.9128709291752769 --random_seed=2   --data_path=../LP-RFFs-Data/covtype --save_path=./tmp --n_sample=20000 --cuda
+```
 ## Citation
 ```
 @article{zhangmay2018lprffs,
