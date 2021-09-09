@@ -1,6 +1,5 @@
 ## Dependencies
-* Python 3.5
-* Numpy, scipy, matplotlib, Tensorflow (For MNIST/Fashion-MNIST dataset), Pytorch (for LP-RFF)
+We run our code with the following dependencies: Python 3.5, Numpy 1.9.0, scikit-learn 0.15.2, matplotlib 1.4.0, Tensorflow (For MNIST/Fashion-MNIST dataset), torchvision 0.2.0
 ## Simulations
 * To reproduce Figure 1 in our paper
 ** For our TRF method , run (Change n_feat accordingly)
