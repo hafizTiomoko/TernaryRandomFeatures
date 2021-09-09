@@ -29,8 +29,8 @@ python run_model.py   --approx_type=cir_rff --n_bit_feat 1 --n_feat=50000  --mod
 python run_model.py   --approx_type=cir_rff --n_bit_feat 8 --n_feat=50000  --model=logistic_regression --opt=sgd --minibatch=250 --l2_reg=1e-05    --epoch=10 --learning_rate=1 --fixed_epoch_number   --kernel_sigma=0.9128709291752769 --random_seed=2   --data_path=../LP-RFFs-Data/covtype --save_path=./tmp --n_sample=20000 --cuda
 ```
 
-* To reproduce Figure 2, use 
-* To reproduce Figure 3, use 
+* To reproduce Figure 2, use Histograms_kernels.ipynb
+* To reproduce Figure 3, use the Jupyter notebook Sparse-Random-Features-based-ridge-regression.ipynb
 * To reproduce Figure 4 in our paper
 ** For our TRF method, run (Change n_feat accordingly)
 ```
@@ -41,9 +41,9 @@ python run_model.py   --approx_type=ternary --n_feat=50000  --opt=sgd --learning
 python run_model.py   --approx_type=rff --n_feat=5000  --n_bit_feat=8    --model=ridge_regression --l2_reg=0.05 --kernel_sigma=28.867513459481287 --random_seed=1   --data_path=../LP-RFFs-Data/census --save_path=./tmp --collect_sample
 ```
 ** For Nystrom, run (Change n_feat accordingly) 
-``
+```
 python run_model.py   --approx_type=nystrom --n_feat=10000 --n_bit_feat=8    --model=ridge_regression --l2_reg=0.05 --kernel_sigma=28.867513459481287 --random_seed=1   --data_path=../LP-RFFs-Data/census --save_path=./tmp  --collect_sample_metrics
-``
+```
 ## Citation
 @article{zhangmay2018lprffs,
   title={Low-Precision Random Fourier Features for Memory-Constrained Kernel Approximation},
