@@ -2,6 +2,7 @@
 We run our code with the following dependencies: Python 3.5, Numpy 1.9.0, scikit-learn 0.15.2, matplotlib 1.4.0, Tensorflow (For MNIST/Fashion-MNIST dataset), torchvision 0.2.0
 ## Simulations
 * To reproduce Figure 1 in our paper
+
 ** For our TRF method , run (Change n_feat accordingly)
 ```
 python run_model.py   --approx_type=ternary  --n_feat=50000  --model=logistic_regression --opt=sgd --minibatch=250 --l2_reg=1e-05    --epoch=10 --learning_rate=1 --fixed_epoch_number   --kernel_sigma=0.9128709291752769 --random_seed=2   --data_path=../LP-RFFs-Data/covtype --save_path=./tmp --n_sample=20000 --cuda
@@ -22,6 +23,7 @@ python run_model.py   --approx_type=cir_rff --n_bit_feat 8 --n_feat=50000  --mod
 * To reproduce Figure 2, use Histograms_kernels.ipynb
 * To reproduce Figure 3, use the Jupyter notebook Sparse-Random-Features-based-ridge-regression.ipynb
 * To reproduce Figure 4 in our paper
+
 ** For our TRF method, run (Change n_feat accordingly)
 ```
 python run_model.py   --approx_type=ternary --n_feat=50000  --opt=sgd --learning_rate=0.001 --n_bit_feat=1    --model=ridge_regression --l2_reg=0.005 --kernel_sigma=28.867513459481287 --random_seed=1   --data_path=../LP-RFFs-Data/census --save_path=./tmp --collect_sample
