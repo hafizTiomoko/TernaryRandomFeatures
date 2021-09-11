@@ -84,6 +84,8 @@ def train(args, model, epoch, train_loader, optimizer, quantizer, kernel):
                 X = kernel.get_cos_feat(X)
             elif args.approx_type == "nystrom":
                 X = kernel.get_feat(X)
+            elif args.approx_type == "ternary":
+                X = kernel.get_ternary_feat(X)
             else:
                 raise Exception("kernel approximation type not supported!")
             if quantizer != None:
@@ -92,7 +94,7 @@ def train(args, model, epoch, train_loader, optimizer, quantizer, kernel):
             X = Variable(X, requires_grad=False)
             Y = Variable(Y, requires_grad=False)
             loss = model.forward(X, Y)
-            train_loss.append(loss[0].data.cpu().numpy() )
+            train_loss.append(loss.data.cpu().numpy() )
             loss.backward()
             optimizer.step()
         # print("epoch ", epoch, "step", i, "loss", loss[0] )
@@ -114,6 +116,8 @@ def evaluate(args, model, epoch, val_loader, quantizer, kernel):
                 X = kernel.get_cos_feat(X)
             elif args.approx_type == "nystrom":
                 X = kernel.get_feat(X)
+            elif args.approx_type == "nystrom":
+                X = kernel.get_ternary_feat(X)
             else:
                 raise Exception("kernel approximation type not supported!")
             if quantizer != None:
@@ -140,6 +144,8 @@ def evaluate(args, model, epoch, val_loader, quantizer, kernel):
                 X = kernel.get_cos_feat(X)
             elif args.approx_type == "nystrom":
                 X = kernel.get_feat(X)
+            elif args.approx_type == "ternary":
+                X = kernel.get_ternary_feat(X)
             else:
                 raise Exception("kernel approximation type not supported!")
             if quantizer != None:
@@ -148,11 +154,15 @@ def evaluate(args, model, epoch, val_loader, quantizer, kernel):
             X = Variable(X, requires_grad=False)
             Y = Variable(Y, requires_grad=False)
             pred = model.predict(X)
-            l2_accum += np.sum( (pred.reshape(pred.size, 1) \
-                - Y.data.cpu().numpy().reshape(pred.size, 1) )**2)
+            #loss = model.forward(X, Y)
+            #print(l2_accum, sample_cnt)
+            #l2_accum += loss.data.cpu().numpy()
             sample_cnt += pred.size
+            l2_accum += np.sum( (pred.reshape(pred.size, 1) \
+                - Y.data.cpu().numpy().reshape(pred.size, 1) )**2)/(np.linalg.norm(pred)**2)
+            #sample_cnt += pred.size
         print("eval_l2 at epoch ", epoch, "step", i, " iterations ", " loss ", np.sqrt(l2_accum / float(sample_cnt) ) )
-        return l2_accum / float(sample_cnt), l2_accum / float(sample_cnt)
+        return np.sqrt(l2_accum / float(sample_cnt)), np.sqrt(l2_accum / float(sample_cnt))
 
 
 def sample_data(X, Y, n_sample):
