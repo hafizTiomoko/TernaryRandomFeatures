@@ -26,6 +26,7 @@ from gaussian_exact import GaussianKernel
 from rff import RFF
 from ternary_rff import TernaryRFF
 from circulant_rff import  CirculantRFF
+from lmrff import LMRFF
 from nystrom import Nystrom
 from ensemble_nystrom import EnsembleNystrom
 from quantizer import Quantizer
@@ -69,7 +70,7 @@ parser.add_argument("--opt_mu", type=float, default=10.0)
 parser.add_argument("--opt_epoch_T", type=float, default=1.0, 
     help="The # of epochs as interval between two consecutive scale updates/full gradient calculation")
 parser.add_argument("--save_path", type=str, default="./test")
-parser.add_argument("--approx_type", type=str, default="rff", help="specify using exact, rff, ternary, or nystrom")
+parser.add_argument("--approx_type", type=str, default="rff", help="specify using exact, lmrff, rff, ternary, or nystrom")
 parser.add_argument("--collect_sample_metrics", action="store_true", 
     help="True if we want to collect metrics from the subsampled kernel matrix")
 parser.add_argument("--n_sample", type=int, default=-1, 
@@ -186,6 +187,11 @@ if __name__ == "__main__":
             print("fp rff feature mode")
             kernel_approx = RFF(args.n_feat, n_input_feat, kernel, rand_seed=args.random_seed)
             quantizer = None
+
+    elif args.approx_type == "lmrff":
+        print("fp rff feature mode")
+        kernel_approx = LMRFF(args.n_feat, n_input_feat, args.n_bit_feat, kernel, rand_seed=args.random_seed)
+        quantizer = None
     elif args.approx_type == "cir_rff":
         if args.do_fp_feat == False:
             print("lp circulant rff feature mode")
